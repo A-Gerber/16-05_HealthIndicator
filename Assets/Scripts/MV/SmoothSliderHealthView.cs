@@ -2,40 +2,28 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SmoothSliderHealthView : MonoBehaviour
+public class SmoothSliderHealthView : HealthView
 {
-    [SerializeField] private Health _health;
+    [SerializeField] private Slider _slider;
     [SerializeField] private float _delay = 0.02f;
     [SerializeField] private float _step = 2f;
 
-    private Slider _slider;
     private Coroutine _coroutine;
     private WaitForSeconds _wait;
 
     private void Awake()
     {
-        _slider = GetComponent<Slider>();
         _wait = new WaitForSeconds(_delay);
     }
 
-    private void OnEnable()
+    protected override void Show(float value)
     {
-        _health.Changed += Show;
+        float sliderValue = value / Health.MaxCount;
+
+        _coroutine = StartCoroutine(ChangeValueOfSlider(sliderValue));
     }
 
-    private void OnDisable()
-    {
-        _health.Changed -= Show;
-    }
-
-    private void Show(float value)
-    {
-        float sliderValue = value / _health.MaxCount;
-
-        _coroutine = StartCoroutine(ChangeVolumeOfSiren(sliderValue));
-    }
-
-    private IEnumerator ChangeVolumeOfSiren(float targetValue)
+    private IEnumerator ChangeValueOfSlider(float targetValue)
     {
         while (_slider.value != targetValue)
         {
